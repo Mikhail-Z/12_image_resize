@@ -15,9 +15,22 @@ def arg_parse():
 
 
 def args_check(args):
-    if (args.width and args.height) and not args.scale:
+    if file_args_check(args) and size_args_check(args):
         return True
-    elif args.scale and not (args.width and args.height):
+    else:
+        return False
+
+
+def file_args_check(args):
+    if args.input:
+        if args.output and check_io_files_existence(args.input, args.output) or \
+                not args.output and os.path.exists(args.input):
+                    return True
+    return False
+
+
+def size_args_check(args):
+    if (args.width and args.height) and not args.scale or args.scale and not (args.width or args.height):
         return True
     else:
         return False
@@ -30,7 +43,7 @@ def resize_image(input, output, width, height, scale):
         new_width, new_height = get_new_width_and_height(im.size[0], im.size[1], scale)
     else:
         new_width, new_height = width, height
-    if im.size[0]/im.size[1] != new_width/new_height:
+    if round(im.size[0]/im.size[1], 2) != round(new_width/new_height, 2):
         print("Note, the proportion of width and height will be changed!")
 
     if not output:
@@ -42,11 +55,9 @@ def resize_image(input, output, width, height, scale):
     output_image.save(path_to_result)
 
 
-def check_file_existence(path_to_original, path_to_result):
-    if not(os.path.exists(path_to_original)) or \
-            (path_to_result and not os.path.exists(path_to_result)):
+def check_io_files_existence(path_to_original, path_to_result):
+    if not(os.path.exists(path_to_original)) or not os.path.exists(path_to_result):
         return False
-
     return True
 
 
@@ -66,10 +77,8 @@ def get_path_to_result(path_to_original, new_width, new_height):
 if __name__ == '__main__':
     args = arg_parse()
     if args_check(args):
-        if check_file_existence(args.input, args.output):
-            resize_image(args.input, args.output, args.width, args.height, args.scale)
-            print("Done!")
-        else:
-            print("No such file or directory")
+        resize_image(args.input, args.output, args.width, args.height, args.scale)
+        print("Done!")
     else:
-        print("You should enter both width and height or scale!")
+        print("Something went wrong."
+              "Check input/output file existence and if you entered both width and height or scale!")
