@@ -23,7 +23,7 @@ def args_check(args):
 
 def file_args_check(args):
     if args.input_file:
-        if args.output_file and check_io_files_existence(args.input, args.output_file) or \
+        if args.output_file and check_io_files_existence(args.input_file, args.output_file) or \
                 not args.output_file and os.path.exists(args.input_file):
             return True
     return False
